@@ -19,7 +19,7 @@ class Trigger:
             expectation is found anywhere in content; if it is ``regex``,
             when content regex-matches expectation; if it is ``evaluate``,
             when ``expectation(content) == True``.            
-            
+
         :param callback: (callable) callback executed when self is triggered.
             Arguments passed to it depend on ``event``.
         """
@@ -29,6 +29,11 @@ class Trigger:
             raise ValueError("Trigger validation incorrect")
         elif not callable(callback):
             raise ValueError("Trigger callback not callable")
+        elif validation == EVALUATE and not callable(expectation):
+            # botdev error: nonsense criterion
+            raise ValueError(
+                "Trigger validation is 'evaluate' but expectation is not callable"
+            )
 
         self.event = event
         self.validation = validation
@@ -52,7 +57,7 @@ class Trigger:
         elif self.validation == REGEX:
             raise NotImplementedError
         elif self.validation == EVALUATE:
-            raise NotImplementedError
+            return self.expectation(content)
 
     def invoke(self, obj):
         event = self.event
