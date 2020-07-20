@@ -11,12 +11,9 @@ setup(
     url="https://git.sr.ht/~fkfd/mastobot",
     author="Frederick Yin",
     author_email="fkfd@macaw.me",
-    classifiers=[
-        "Development Status :: 3 - Alpha",
-        "License :: Public Domain",
-    ],
+    classifiers=["Development Status :: 3 - Alpha", "License :: Public Domain",],
     packages=find_packages(),
     include_package_data=True,
     python_requires=">=3.6",
-    install_requires=["lxml"],
+    install_requires=["Mastodon.py", "lxml"],
 )

@@ -9,9 +9,10 @@ class Trigger:
         :param validation: (str) may be "equals", "contains", "regex" or "evaluate".
         :param expectation: (str or callable) string, regex string or function
             to test content of relevant status against.
+
             Suppose the normalized (html-to-text converted) content of the status
             received is ``content``.
-            
+
             If ``validation`` is "equals", the trigger will be invoked when
             content exactly matches expectation; if it is ``contains``, when
             expectation is found anywhere in content; if it is ``regex``,

@@ -18,6 +18,8 @@ class Bot:
         """
         self._instance = instance_url
         self._token = access_token
+        self._handle = ""  # will be like "bot@instance.tld"
+        self._atname = ""  # will be like "@bot"
         self._triggers = []
         self._check_update_triggers = lambda o: self._check_triggers(o, UPDATE)
         self._check_notification_triggers = lambda o: self._check_triggers(
@@ -25,23 +27,40 @@ class Bot:
         )
 
     def _check_triggers(self, obj: dict, stream: str):
-        """Handle events from ``mastodon.StreamListeupdate_ner.on_update()`` if 
+        """Handle events from ``mastodon.StreamListener.on_update()`` if 
             ``stream=="update"``, and ``mastodon.StreamListener.on_notification()``
             if ``stream=="notification"``.
         """
-        # TODO if the bot is mentioned, strip the mention text @bot
+        # set up expectations
+        if stream == UPDATE:
+            status = obj
+            event = UPDATE
+        elif stream == NOTIFICATION:
+            status = obj["status"]
+            event = obj["type"]
+        else:
+            return
+
+        # if the bot is mentioned, remove the mention text from status content
+        # before testing trigger
+        mentioned_accts = [m["acct"] for m in status["mentions"]]
+        if self._handle in mentioned_accts:
+            to_be_removed = self._atname
+        else:
+            to_be_removed = ""
 
         for trig in self._triggers:
-            if stream == trig.event == UPDATE and trig.test(
-                UPDATE, html_to_text(obj["content"])
+            if not trig.event == event:
+                continue
+            if trig.test(
+                event,
+                html_to_text(status["content"]).replace(to_be_removed, "", 1).strip(),
             ):
-                self._reply(obj, trig.invoke(obj))
-            elif (
-                stream == NOTIFICATION
-                and trig.event == obj["type"]
-                and trig.test(obj["type"], html_to_text(obj["status"]["content"]))
-            ):
-                self._reply(obj["status"], trig.invoke(obj))
+                # pass obj to trig. trig will decide which elements
+                # to pass on to bot-developer-defined callback.
+                reply = trig.invoke(obj)
+                if reply:
+                    self._reply(status, reply)
 
     def _reply(self, status: dict, content):
         """Reply to a status with content.
@@ -130,6 +149,12 @@ class Bot:
         """
         self._bot = Mastodon(api_base_url=self._instance, access_token=self._token)
         print("Connected to " + self._instance)
+
+        # keep a record of what this bot is called
+        # so that "@atname" can be removed when necessary.
+        me = self._bot.account_verify_credentials()
+        self._handle = me["acct"]
+        self._atname = "@" + me["username"]
 
         # register stream listeners
         self._user_stream = StreamListener()

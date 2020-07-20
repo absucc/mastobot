@@ -1,9 +1,12 @@
 from mastobot import *
+from os import environ
 
 if __name__ == "__main__":
-    bot = Bot("https://yeet.social", "pMkDvctDbWEv5nL8zfTtm_X0LPmosbnj-h9I59s7Z8o")
+    instance = environ.get("INSTANCE")
+    token = environ.get("ACCESS_TOKEN")
+    bot = Bot(instance, token)
 
-    @bot.on_mention("@c18n henlo", validation=EQUALS)
+    @bot.on_mention("henlo", validation=EQUALS)
     def respond(notif):
         return "hi, " + notif["status"]["account"]["username"]
 
