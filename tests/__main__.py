@@ -7,8 +7,8 @@ if __name__ == "__main__":
     bot = Bot(instance, token)
 
     @bot.on_mention("henlo", validation=EQUALS)
-    def respond(notif):
-        return "hi, " + notif["status"]["account"]["username"]
+    def respond(status):
+        return "hi, " + status.account.display_name
 
     @bot.on_home_update("mastobot", validation=CONTAINS)
     def online(status):

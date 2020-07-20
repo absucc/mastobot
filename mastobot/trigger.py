@@ -1,3 +1,4 @@
+from .structs import *
 from .constants import *
 
 
@@ -54,4 +55,18 @@ class Trigger:
             raise NotImplementedError
 
     def invoke(self, obj):
-        return self.callback(obj)
+        event = self.event
+        if event == UPDATE:
+            # what did they say?
+            args = [gen_status(obj)]
+        elif event == MENTION:
+            # what did they say?
+            args = [gen_status(obj["status"])]
+        elif event in [REBLOG, FAVOURITE]:
+            # who boosted/favourited your post,
+            # and what was your post that made them boost/fav?
+            args = [gen_account(obj["account"]), gen_status(obj["status"])]
+        else:
+            return
+
+        return self.callback(*args)

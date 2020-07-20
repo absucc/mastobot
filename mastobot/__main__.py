@@ -1,6 +1,6 @@
 from mastodon import Mastodon, StreamListener
 from .html_text import html_to_text
-from .reply import Reply
+from .structs import *
 from .trigger import Trigger
 from .constants import *
 
@@ -94,7 +94,7 @@ class Bot:
                 SPOILER_TEXT: content.spoiler_text or status[SPOILER_TEXT],
             }
 
-        self._bot.status_reply(to_status=status, in_reply_to_id=status["id"], **args)
+        self._bot.status_reply(to_status=status, **args)
 
     # decorator generators
 

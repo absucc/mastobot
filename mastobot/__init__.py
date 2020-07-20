@@ -1,3 +1,3 @@
 from .__main__ import Bot
-from .reply import Reply
+from .structs import Reply, Boost, Favourite
 from .constants import *
