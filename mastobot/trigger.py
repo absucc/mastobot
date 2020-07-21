@@ -3,7 +3,9 @@ from .constants import *
 
 
 class Trigger:
-    def __init__(self, event: str, validation: str, expectation, callback):
+    def __init__(
+        self, event: str, validation: str, expectation, callback, case_sensitive=False
+    ):
         """Describes a condition that would trigger a callback.
 
         :param event: (str) may be "mention", "favourite", "reblog", "follow", or "update".
@@ -39,6 +41,7 @@ class Trigger:
         self.validation = validation
         self.expectation = expectation
         self.callback = callback
+        self.case_sensitive = case_sensitive
 
     def test(self, event: str, content: str):
         """Test if self should be triggered.
@@ -50,8 +53,17 @@ class Trigger:
         if not event == self.event:
             return
 
+        if not self.case_sensitive:
+            content = content.lower()
+            if self.validation in [EQUALS, CONTAINS]:
+                expectation = self.expectation.lower()
+            else:
+                expectation = self.expectation
+        else:
+            expectation = self.expectation
+
         if self.validation == EQUALS:
-            return content == self.expectation
+            return content == expectation
         elif self.validation == CONTAINS:
             return content.find(self.expectation) > -1
         elif self.validation == REGEX:

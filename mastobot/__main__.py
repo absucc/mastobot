@@ -60,19 +60,33 @@ class Bot:
                 # to pass on to bot-developer-defined callback.
                 reply = trig.invoke(obj)
                 if reply:
-                    self._reply(status, reply)
+                    self._respond(status, reply)
 
-    def _reply(self, status: dict, content):
-        """Reply to a status with content.
+    def _respond(self, status: dict, content):
+        """Reply to a status with content, boost, or favourite it.
 
-        :param status: (dict) the status to reply to.
-        :param content: (str or mastobot.Reply) When ``content`` is a string,
+        :param status: (dict) the status to respond to.
+        :param content: When ``content`` is a string,
             simply reply with it, keeping everything else as Mastodon.py decides.
-            When it is an instance of the ``mastobot.Status`` class, all its arguments
+            When it is an instance of the ``mastobot.Reply`` class, all its arguments
             will be passed on to Mastodon.py. The rest are left in their default state.
+            When it is ``mastobot.Boost``, boost ``status``. Ditto for ``Favourite``.
+            When it is a list/tuple, recursively call ``self._respond(status, n)``
+            for each ``n`` in content.
         """
         if not content:
-            raise ValueError(f"Status content empty; reply to {status['id']} aborted")
+            raise ValueError(f"Response to {status['id']} empty; aborted")
+
+        if type(content) in (list, tuple):
+            for n in content:
+                self._respond(status, n)
+            return
+        elif content == Boost:
+            self._bot.status_reblog(status["id"])
+            return
+        elif content == Favourite:
+            self._bot.status_favourite(status["id"])
+            return
         elif type(content) == str:
             args = {
                 STATUS: content,
@@ -98,7 +112,7 @@ class Bot:
 
     # decorator generators
 
-    def on_mention(self, expectation, validation=EQUALS):
+    def on_mention(self, expectation, validation=EQUALS, case_sensitive=False):
         """Listen to mentions and invoke a callback with the Mastodon.py
             notification dict as argument.
 
@@ -114,12 +128,13 @@ class Bot:
                     validation=validation,
                     expectation=expectation,
                     callback=callback,
+                    case_sensitive=case_sensitive,
                 )
             )
 
         return decorator
 
-    def on_home_update(self, expectation, validation=EQUALS):
+    def on_home_update(self, expectation, validation=EQUALS, case_sensitive=False):
         """Listen to updates on the home timeline and invoke a callback with
             the Mastodon.py status (toot) dict as argument.
 
@@ -135,6 +150,7 @@ class Bot:
                     validation=validation,
                     expectation=expectation,
                     callback=callback,
+                    case_sensitive=case_sensitive,
                 )
             )
 
