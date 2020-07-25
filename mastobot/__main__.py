@@ -113,8 +113,8 @@ class Bot:
     # decorator generators
 
     def on_mention(self, expectation, validation=EQUALS, case_sensitive=False):
-        """Listen to mentions and invoke a callback with the Mastodon.py
-            notification dict as argument.
+        """Listen to mentions and invoke a callback with a ``Status`` object
+            as argument.
 
         :param expectation: (str or callable) string, regex string or callable
             that evaluates to True if the status content is what you want.
@@ -136,7 +136,7 @@ class Bot:
 
     def on_home_update(self, expectation, validation=EQUALS, case_sensitive=False):
         """Listen to updates on the home timeline and invoke a callback with
-            the Mastodon.py status (toot) dict as argument.
+            a ``Status`` object as argument.
 
         :param expectation: (str or callable) string, regex string or callable
             that evaluates to True if the status content is what you want.
