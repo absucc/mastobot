@@ -58,6 +58,11 @@ def compliment_meme(status):
             Reply("brilliant meme!", visibility=PRIVATE),
         ]
 
+# invoke when re.search("(:hacker_[a-z]:\s)+", status_dict["content"]) is not None
+@bot.on_home_update("(:hacker_[a-z]:\s)+", validation=REGEX)
+def nice_hacker_font(status):
+    return Reply("nice hacker font you have", visibility=DIRECT)
+
 bot.run()
 ```
 
