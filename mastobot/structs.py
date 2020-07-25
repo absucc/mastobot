@@ -16,7 +16,7 @@ class Reply:
             raise ValueError("Argument `text` cannot be empty")
         self.text = str(text)
 
-        if not visibility in VISIBILITY_LIST + None:
+        if not visibility in VISIBILITY_LIST + [None]:
             raise ValueError(
                 "Argument `visibility` must be one of "
                 "'public', 'unlisted', 'private', or 'direct'"

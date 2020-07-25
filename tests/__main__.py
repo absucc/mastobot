@@ -16,6 +16,16 @@ if __name__ == "__main__":
     def respond(status):
         return "hi, " + status.account.display_name
 
+    """Test 'regex' validation
+
+    input: :hacker_e: :hacker_d: :hacker_g: :hacker_y:
+    outpur: nice hacker font you have
+    """
+
+    @bot.on_home_update("(:hacker_[a-z]:\s)+", validation=REGEX)
+    def nice_hacker_font(status):
+        return Reply("nice hacker font you have", visibility=UNLISTED)
+
     """Test 'evaluate' validation
 
     input: :cate: :cate: :cate:

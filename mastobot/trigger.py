@@ -1,3 +1,4 @@
+import re
 from .structs import *
 from .constants import *
 
@@ -67,7 +68,7 @@ class Trigger:
         elif self.validation == CONTAINS:
             return content.find(self.expectation) > -1
         elif self.validation == REGEX:
-            raise NotImplementedError
+            return re.search(expectation, content)
         elif self.validation == EVALUATE:
             return self.expectation(content)
 

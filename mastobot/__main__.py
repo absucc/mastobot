@@ -98,13 +98,6 @@ class Bot:
             args = {
                 STATUS: content.text,
                 VISIBILITY: content.visibility or status[VISIBILITY],
-                # awkward syntax because content.sensitive can be False
-                # in which case `content.sensitive or status["sensitive"]`
-                SENSITIVE: (
-                    content.sensitive
-                    if content.sensitive is not None
-                    else status[SENSITIVE]
-                ),
                 SPOILER_TEXT: content.spoiler_text or status[SPOILER_TEXT],
             }
 
