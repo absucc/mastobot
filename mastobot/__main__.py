@@ -1,4 +1,5 @@
 from mastodon import Mastodon, StreamListener
+from .ws import WebsocketListener
 from .html_text import html_to_text
 from .structs import *
 from .trigger import Trigger
@@ -8,19 +9,21 @@ from .constants import *
 
 
 class Bot:
-    def __init__(self, instance_url: str, access_token: str):
+    def __init__(self, instance_url: str, access_token: str, websocket_mode=False):
         """Intiate a Mastodon bot.
 
         :param instance_url: (str) base URL for your Mastodon instance of choice,
             e.g. ``https://mastodon.technology``.
         :param access_token: (str) "Your access token" inside
             Preferences -> Development -> some application.
+        :param websocket_mode: (bool) whether to use websockets for streaming
         """
         self._instance = instance_url
         self._token = access_token
         self._handle = ""  # will be like "bot@instance.tld"
         self._atname = ""  # will be like "@bot"
         self._triggers = []
+        self._websocket_mode = websocket_mode
         self._check_update_triggers = lambda o: self._check_triggers(o, UPDATE)
         self._check_notification_triggers = lambda o: self._check_triggers(
             o, NOTIFICATION
@@ -166,7 +169,17 @@ class Bot:
         self._atname = "@" + me["username"]
 
         # register stream listeners
-        self._user_stream = StreamListener()
-        self._user_stream.on_update = self._check_update_triggers
-        self._user_stream.on_notification = self._check_notification_triggers
-        self._bot.stream_user(self._user_stream)
+        if not self._websocket_mode:
+            # use Mastodon.py StreamListener
+            self._user_stream = StreamListener()
+            self._user_stream.on_update = self._check_update_triggers
+            self._user_stream.on_notification = self._check_notification_triggers
+            self._bot.stream_user(self._user_stream)
+        else:
+            # use ws interface I implemented myself
+            self._user_stream = WebsocketListener(
+                self._bot.instance(), self._token, stream="user"
+            )
+            self._user_stream.on_update = self._check_update_triggers
+            self._user_stream.on_notification = self._check_notification_triggers
+            self._user_stream.start_stream()
