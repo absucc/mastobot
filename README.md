@@ -116,6 +116,13 @@ Don't use Mastobot when:
 - You need to post images or other media. Too fancy. Write your own.
 - You want to harass users. No substitute. Simply don't.
 
+## Features
+
+- Pleroma support (best-effort)
+- Streaming
+  - Server-sent events
+  - WebSockets
+
 ## Terminology
 
 I try to keep my terms consistent. Here is a table of them.
