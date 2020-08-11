@@ -1,6 +1,7 @@
 from typing import NamedTuple
 from datetime import datetime
 from .constants import *
+from .html_text import html_to_text
 
 """bot-dev-constructed objects"""
 
@@ -58,6 +59,7 @@ Status = NamedTuple(
         ("account", Account),
         ("in_reply_to_id", int),
         ("content", str),
+        ("text", str),
         ("created_at", datetime),
         ("sensitive", bool),
         ("spoiler_text", str),
@@ -98,6 +100,7 @@ def gen_status(obj: dict) -> Status:
         ),
         in_reply_to_id=obj["in_reply_to_id"],
         content=obj["content"],
+        text=html_to_text(obj["content"]),
         created_at=obj["created_at"],
         sensitive=obj[SENSITIVE],
         spoiler_text=obj[SPOILER_TEXT],

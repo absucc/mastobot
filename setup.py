@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="mastobot",
-    version="0.2.0",
+    version="0.2.1",
     description="Create cheap Mastodon bots in a Flask-like syntax",
     long_description=open("./README.md").read(),
     long_description_content_type="text/markdown",

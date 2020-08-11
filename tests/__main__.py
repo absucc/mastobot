@@ -4,7 +4,7 @@ from os import environ
 if __name__ == "__main__":
     instance = environ.get("INSTANCE")
     token = environ.get("ACCESS_TOKEN")
-    bot = Bot(instance, token)
+    bot = Bot(instance, token, websocket_mode=True)
 
     """Test mention
 
@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     @bot.on_home_update(has_more_than_two_cates, validation=EVALUATE)
     def so_many_cates(status):
-        cate_count = status.content.count(":cate:")
+        cate_count = status.text.count(":cate:")
         return Reply(f"Woah, {cate_count} cates - that's a lot!")
 
     """Test home timeline with 'contains' validation

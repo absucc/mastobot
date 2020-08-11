@@ -5,7 +5,7 @@ from .constants import *
 
 class Trigger:
     def __init__(
-        self, event: str, validation: str, expectation, callback, case_sensitive=False
+        self, event: str, validation: str, expectation, callback, case_sensitive=None
     ):
         """Describes a condition that would trigger a callback.
 
@@ -25,6 +25,9 @@ class Trigger:
 
         :param callback: (callable) callback executed when self is triggered.
             Arguments passed to it depend on ``event``.
+
+        :param case_sensitive: (bool) whether the trigger test will be case sensitive.
+            Default: ``True`` if ``validation`` is "equals" or "contains", ``False`` otherwise.
         """
         if event not in EVENT_LIST:
             raise ValueError("Trigger event incorrect")
@@ -42,7 +45,13 @@ class Trigger:
         self.validation = validation
         self.expectation = expectation
         self.callback = callback
-        self.case_sensitive = case_sensitive
+        if case_sensitive is not None:
+            self.case_sensitive = case_sensitive
+        else:
+            if validation in [EQUALS, CONTAINS]:
+                self.case_sensitive = True
+            else:
+                self.case_sensitive = False
 
     def test(self, event: str, content: str):
         """Test if self should be triggered.
@@ -54,12 +63,9 @@ class Trigger:
         if not event == self.event:
             return
 
-        if not self.case_sensitive:
+        if self.validation in [EQUALS, CONTAINS] and not self.case_sensitive:
             content = content.lower()
-            if self.validation in [EQUALS, CONTAINS]:
-                expectation = self.expectation.lower()
-            else:
-                expectation = self.expectation
+            expectation = self.expectation.lower()
         else:
             expectation = self.expectation
 
@@ -68,7 +74,10 @@ class Trigger:
         elif self.validation == CONTAINS:
             return content.find(self.expectation) > -1
         elif self.validation == REGEX:
-            return re.search(expectation, content)
+            if self.case_sensitive:
+                return re.search(expectation, content)
+            else:
+                return re.search(expectation, content, re.IGNORECASE)
         elif self.validation == EVALUATE:
             return self.expectation(content)
 

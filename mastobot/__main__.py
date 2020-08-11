@@ -43,7 +43,6 @@ class Bot:
             event = obj["type"]
         else:
             return
-
         # if the bot is mentioned, remove the mention text from status content
         # before testing trigger
         mentioned_accts = [m["acct"] for m in status["mentions"]]
@@ -51,7 +50,6 @@ class Bot:
             to_be_removed = self._atname
         else:
             to_be_removed = ""
-
         for trig in self._triggers:
             if not trig.event == event:
                 continue
@@ -93,7 +91,6 @@ class Bot:
         elif type(content) == str:
             args = {
                 STATUS: content,
-                SENSITIVE: status[SENSITIVE],
                 VISIBILITY: status[VISIBILITY],
                 SPOILER_TEXT: status[SPOILER_TEXT],
             }
@@ -104,7 +101,7 @@ class Bot:
                 SPOILER_TEXT: content.spoiler_text or status[SPOILER_TEXT],
             }
 
-        self._bot.status_reply(to_status=status, **args)
+        self._bot.status_post(in_reply_to_id=status["id"], **args)
 
     # decorator generators
 
